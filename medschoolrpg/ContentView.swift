@@ -10,32 +10,54 @@ import Combine
 
 // MARK: - 1. Model (Data Layer)
 
-// Create a simple Quest model.
+/// A model representing a quest or task in the medical school RPG game.
+/// Conforms to Identifiable for use in SwiftUI lists and collections.
 struct Quest: Identifiable {
+    /// Unique identifier for the quest, automatically generated
     let id = UUID()
+    /// The display name of the quest
     let title: String
+    /// Detailed description of what the quest entails
     let description: String
+    /// Tracks whether the player has completed this quest
     var isCompleted: Bool = false
 }
 
-// Create the GameState model to hold all game data.
+/**
+ * The central data model for the MedSchoolRPG game.
+ * 
+ * This class represents the Model layer in the MVVM architecture, containing all
+ * game state data and basic data manipulation methods. It uses @Published properties
+ * to automatically notify the UI of state changes.
+ */
 class GameState: ObservableObject {
+    /// The player's current stamina level (0-100). Used for action costs and fatigue tracking.
     @Published var playerStamina: Int = 100
+    
+    /// The player's accumulated knowledge points. Represents learning progress.
     @Published var playerKnowledge: Int = 0
+    
+    /// Array of all game messages and command responses displayed to the player.
     @Published var gameHistory: [String] = [
         "Welcome to MedSchoolRPG. Your journey begins...",
         "",
         "Type 'help' to see available commands."
     ]
+    
+    /// Collection of all available and completed quests in the game.
     @Published var quests: [Quest] = [
         Quest(title: "Find the missing coffee mug", description: "Search the cafeteria for your lost mug. -10 stamina."),
         Quest(title: "Review patient charts", description: "Increase your knowledge by studying medical records. -15 stamina.")
     ]
     
+    /// Adds a single message to the game history.
+    /// - Parameter text: The message to add to the history
     func addToHistory(_ text: String) {
         gameHistory.append(text)
     }
     
+    /// Adds multiple messages to the game history at once.
+    /// - Parameter texts: Array of messages to add to the history
     func addMultipleToHistory(_ texts: [String]) {
         gameHistory.append(contentsOf: texts)
     }
@@ -43,12 +65,32 @@ class GameState: ObservableObject {
 
 // MARK: - 2. View Model (Logic Layer)
 
-// Create the GameViewModel to manage game logic and state updates.
+/**
+ * The ViewModel layer for the MedSchoolRPG game following MVVM architecture.
+ * 
+ * This class serves as the intermediary between the View (ContentView) and Model (GameState),
+ * handling all game logic, command processing, and state management. It processes user input
+ * and updates the game state accordingly, ensuring separation of concerns between UI and
+ * business logic.
+ */
 class GameViewModel: ObservableObject {
+    /// The current game state containing all game data
     @Published var gameState: GameState = GameState()
+    /// The current text input from the player
     @Published var playerInput: String = ""
     
-    // Function to process player commands.
+    /**
+     * Processes and executes player commands in the game.
+     * 
+     * This method serves as the main command interpreter for the RPG, parsing player input
+     * and executing the corresponding game actions. It handles all game commands including
+     * status checks, quest management, character actions, and help functionality.
+     * 
+     * The method automatically adds the command to game history, processes it based on
+     * predefined cases, updates game state as needed, and clears the input field.
+     * 
+     * - Parameter command: The raw command string entered by the player
+     */
     func processCommand(_ command: String) {
         let lowercasedCommand = command.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         
@@ -177,7 +219,19 @@ class GameViewModel: ObservableObject {
 
 // MARK: - 3. View (UI Layer)
 
-// Create the main view for the game interface.
+/**
+ * The main user interface for the MedSchoolRPG game.
+ * 
+ * This SwiftUI view represents the View layer in the MVVM architecture, providing
+ * the complete game interface including:
+ * - Header with game title and real-time player stats
+ * - Scrollable game history display with command output
+ * - Command input field for player interactions
+ * 
+ * The view observes the GameViewModel for state changes and automatically updates
+ * the UI when game state changes occur. It handles user input and delegates all
+ * game logic to the ViewModel layer.
+ */
 struct ContentView: View {
     @StateObject private var viewModel = GameViewModel()
     
