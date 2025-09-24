@@ -1,24 +1,18 @@
 //
-//  AppDelegate.swift
+//  MedSchoolRPGApp.swift
 //  medschoolrpg
 //
 //  Created by Theodore Addo on 9/24/25.
 //
 
-
-import Cocoa
+import SwiftUI
 
 @main
-class AppDelegate: NSObject, NSApplicationDelegate {
-    
-    
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Insert code here to initialize your application
+struct MedSchoolRPGApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+        .windowStyle(DefaultWindowStyle())
     }
-    
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-    }
-    
-    
 }
